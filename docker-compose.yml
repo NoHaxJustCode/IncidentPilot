@@ -1,5 +1,7 @@
 services:
   incidentpilot:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     ports:
       - "8000:8000"
