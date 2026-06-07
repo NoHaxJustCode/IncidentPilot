@@ -18,10 +18,22 @@ def health():
     return {"status": "ok"}
 
 
+def _frontend_path() -> Path | None:
+    here = Path(__file__).resolve()
+    candidates = [
+        here.parents[2] / "frontend" / "index.html",
+        here.parents[1] / "frontend" / "index.html",
+    ]
+    for path in candidates:
+        if path.exists():
+            return path
+    return None
+
+
 @app.get("/", response_class=HTMLResponse)
 def index():
-    frontend = Path(__file__).resolve().parents[2] / "frontend" / "index.html"
-    if frontend.exists():
+    frontend = _frontend_path()
+    if frontend:
         return frontend.read_text(encoding="utf-8")
     return "<h1>IncidentPilot</h1><p>POST /investigate to investigate a ticket.</p>"
 
