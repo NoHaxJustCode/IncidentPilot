@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IncidentPilot</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, sans-serif; margin: 0; background: #0f172a; color: #e5e7eb; }
+    main { max-width: 1100px; margin: 0 auto; padding: 32px; }
+    textarea { width: 100%; min-height: 110px; border-radius: 12px; padding: 14px; border: 1px solid #334155; background: #111827; color: #e5e7eb; }
+    button { margin-top: 12px; padding: 10px 16px; border: 0; border-radius: 10px; cursor: pointer; font-weight: 700; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 20px; }
+    .card { background: #111827; border: 1px solid #334155; border-radius: 16px; padding: 18px; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #020617; padding: 14px; border-radius: 12px; }
+    li { margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>IncidentPilot</h1>
+    <p>Agentic production-debugging demo using synthetic logs, metrics, traces, deploys, SQL, and code snippets.</p>
+    <textarea id="ticket">Checkout latency increased for premium users after deploy 4921. p95 went from 240ms to 1800ms around 14:05 UTC.</textarea>
+    <br />
+    <button onclick="investigate()">Investigate</button>
+    <button onclick="runEval()">Run eval</button>
+    <div class="grid">
+      <section class="card">
+        <h2>Report</h2>
+        <div id="report">No investigation yet.</div>
+      </section>
+      <section class="card">
+        <h2>Raw JSON</h2>
+        <pre id="raw">{}</pre>
+      </section>
+    </div>
+  </main>
+  <script>
+    async function investigate() {
+      const ticket = document.getElementById('ticket').value;
+      const res = await fetch('/investigate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ticket})
+      });
+      const data = await res.json();
+      document.getElementById('raw').textContent = JSON.stringify(data, null, 2);
+      document.getElementById('report').innerHTML = `
+        <p><strong>${data.summary}</strong></p>
+        <p>Confidence: ${data.confidence}</p>
+        <h3>Evidence</h3>
+        <ul>${data.evidence.map(e => `<li><code>${e.id}</code>: ${e.summary}</li>`).join('')}</ul>
+        <h3>Next steps</h3>
+        <ul>${data.next_steps.map(s => `<li>${s}</li>`).join('')}</ul>
+      `;
+    }
+    async function runEval() {
+      const res = await fetch('/eval/run');
+      const data = await res.json();
+      document.getElementById('raw').textContent = JSON.stringify(data, null, 2);
+      document.getElementById('report').innerHTML = '<p><strong>Eval complete.</strong></p>';
+    }
+  </script>
+</body>
+</html>
