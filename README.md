@@ -8,7 +8,7 @@ The project uses fully synthetic data. It can parse a ticket, inspect deploy met
 
 - CLI and localhost dashboard
 - FastAPI backend
-- SQLite-backed synthetic observability store
+- Synthetic observability store
 - Tool-calling investigation pipeline
 - Evaluation harness
 - Tests, Docker, and CI
