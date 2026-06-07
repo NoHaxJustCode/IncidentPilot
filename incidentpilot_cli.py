@@ -1,1 +1,0 @@
-print('IncidentPilot CLI placeholder')
